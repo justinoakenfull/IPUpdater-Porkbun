@@ -4,16 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IPUpdater.Data
+namespace IPUpdater.Models.PostModels
 {
-    public class Record
+    public class PostEditModel : PostModel
     {
-        public int id { get; set; }
+        public string id { get; set; }
         public string name { get; set; }
         public string type { get; set; }
         public string content { get; set; }
         public string ttl { get; set; }
-        public string prio { get; set; }
-        public string notes { get; set; }
     }
 }
