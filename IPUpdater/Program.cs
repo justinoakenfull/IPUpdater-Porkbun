@@ -1,6 +1,4 @@
 ﻿using System.Configuration;
-using System.Collections.Specialized;
-using IPUpdater.Data;
 using IPUpdater.Services;
 using IPUpdater.Models;
 
