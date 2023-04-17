@@ -11,6 +11,6 @@ namespace IPUpdater.Services
     {
         ResponsePing PingAPI();
         ResponseRetrieve GetDNSRecords();
-        void UpdateDNSRecords();
+        List<ResponseModel> UpdateDNSRecords(ResponseRetrieve allRecords);
     }
 }

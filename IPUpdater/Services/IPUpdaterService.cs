@@ -61,9 +61,9 @@ namespace IPUpdater.Services
             return dnsRetrieveResponseModel;
         }
 
-        public List<DNSRecordModel> FilterDNSRecordsFromResponse(ResponseRetrieve responseRetrieve, string dnsType)
+        public List<PostEditModel> FilterDNSRecordsFromResponse(ResponseRetrieve responseRetrieve, string dnsType)
         {
-            List<DNSRecordModel> filteredRecords = new List<DNSRecordModel>();
+            List<PostEditModel> filteredRecords = new List<PostEditModel>();
 
             foreach (var record in responseRetrieve.records)
             {
@@ -71,16 +71,60 @@ namespace IPUpdater.Services
                     record.type.ToLower().Equals(dnsType.ToLower()) && 
                     !record.content.Equals(currentIP))
                 {
-                    filteredRecords.Add(record);
+                    filteredRecords.Add(new PostEditModel
+                    {
+                        //Api keys
+                        apikey = _userSettings.apiKey,
+                        secretapikey = _userSettings.secretapikey,
+
+                        //dns records
+
+                        //For some reason keeping the domain name in the update json adds it in addition to what is existing. Not sure if I'm doing something wrong or
+                        //just a weird quirk with their api. This ternary checks if whats its updating is a subdomain or not and either leaves is blank if its
+                        //just the domain or keeps just the subdomain if it is one. 
+                        name = record.name.Split('.')[0] + "." + record.name.Split('.')[1] == _userSettings.DomainToUpdate ? "" : record.name.Split('.')[0],
+                        id = record.id,
+                        type = _userSettings.RecordTypeToUpdate,
+                        content = currentIP,
+                        ttl = record.ttl,
+                    });
                 }
             }
 
             return filteredRecords;
         }
 
-        public void UpdateDNSRecords()
+        public List<ResponseModel> UpdateDNSRecords(ResponseRetrieve allRecords)
         {
-            throw new NotImplementedException();
+            var recordsToUpdate = FilterDNSRecordsFromResponse(allRecords, _userSettings.RecordTypeToUpdate);
+
+            if (recordsToUpdate == null)
+            {
+                //Return a single response with a warning.
+                return new List<ResponseModel> { new ResponseModel { status = "WARNING", message = "Records to update was null."} };
+            }
+
+            //Make sure we have the most updated IP before editting the DNS Records.
+            UpdateIP();
+            //List of servers responses.
+            List<ResponseModel> responsesFromAPI = new List<ResponseModel>();
+            foreach (var record in recordsToUpdate)
+            {
+
+                var _httpClient = CreateHttpClient($"{_userSettings.APIDNSEditURI}{_userSettings.DomainToUpdate}/{record.id}");
+                var content = new StringContent(JsonConvert.SerializeObject(record), UTF8Encoding.UTF8, "application/json");
+                var apiResponse = _httpClient.PostAsync(_httpClient.BaseAddress, content);
+                var readContentResponse = apiResponse.Result.Content.ReadAsStringAsync().Result;
+                var responseModel = JsonConvert.DeserializeObject<ResponseModel>(readContentResponse);
+                if (responseModel != null)
+                {
+                    responseModel.message = responseModel.status == "SUCCESS" ? 
+                                            $"DNS Record was successfully updated to {currentIP}." : 
+                                            $"There was a problem updating {record.name}: {record.id}.";
+                    responsesFromAPI.Add(responseModel);
+                }
+            }
+            return responsesFromAPI;
         }
 
         public IPUpdaterService(UserSettingsModel userSettings)
@@ -99,5 +143,7 @@ namespace IPUpdater.Services
         }
 
         private void CloseHttpClient(HttpClient client) { client.Dispose(); }
+
+        private void UpdateIP() { PingAPI(); }
     }
 }

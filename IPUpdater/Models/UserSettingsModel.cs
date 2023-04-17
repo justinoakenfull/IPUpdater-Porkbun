@@ -15,11 +15,12 @@ namespace IPUpdater.Models
         public string APIPingURI { get; set; }
         public string APIDNSRequestURI { get; set; }
         public string APIDNSEditURI { get; set; }
+        public bool VerboseDebugging { get; set; }
 
         public UserSettingsModel(string storedApiKey, string storedSecretApiKey,
                                  string storedDomainToUpdate, string storedRecordTypeToUpdate,
                                  string storedAPIPingURI, string storedAPIDNSRequestURI,
-                                 string storedAPIDNSEditURI) 
+                                 string storedAPIDNSEditURI, string storedVerboseDebugging) 
         {
             apiKey = storedApiKey;
             secretapikey = storedSecretApiKey;
@@ -28,6 +29,13 @@ namespace IPUpdater.Models
             APIPingURI = storedAPIPingURI;
             APIDNSRequestURI = storedAPIDNSRequestURI;
             APIDNSEditURI = storedAPIDNSEditURI;
+            VerboseDebugging = storedVerboseDebugging == "True" ? 
+                                                         true : 
+                               storedVerboseDebugging == "true" ? 
+                                                         true :
+                               storedVerboseDebugging == "TRUE" ? 
+                                                         true : 
+                                                         false;
         }
     }
 }
