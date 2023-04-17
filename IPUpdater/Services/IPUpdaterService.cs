@@ -15,6 +15,7 @@ namespace IPUpdater.Services
     {
         private HttpClient _httpClient = new HttpClient();
         private UserSettingsModel _userSettings;
+        private string currentIP = "";
         
         public ResponsePing PingAPI()
         {
@@ -37,13 +38,48 @@ namespace IPUpdater.Services
                 status = "ERROR",
                 message = "This error is not server produced. Error pinging API or JSON received was empty."
             };
-
+            if (pingResponseModel.yourip != null)
+            {
+                currentIP = pingResponseModel.yourip;
+            }
             return pingResponseModel;
         }
 
-        public void GetDNSRecords()
+        public ResponseRetrieve GetDNSRecords()
         {
-            throw new NotImplementedException();
+            _httpClient.BaseAddress = new Uri(_userSettings.APIDNSRequestURI);
+
+            PostRequestModel postRequest = new PostRequestModel();
+
+            var content = new StringContent(JsonConvert.SerializeObject(postRequest), UTF8Encoding.UTF8, "application/json");
+            var apiResponse = _httpClient.PostAsync(_httpClient.BaseAddress, content);
+            var readContentResponse = apiResponse.Result.Content.ReadAsStringAsync().Result;
+            var dnsRetrieveResponseModel = JsonConvert.DeserializeObject<ResponseRetrieve>(readContentResponse);
+
+            dnsRetrieveResponseModel ??= new ResponseRetrieve
+            {
+                status = "ERROR",
+                message = "This error is not server produced. Error pinging API or JSON received was empty."
+            };
+
+            return dnsRetrieveResponseModel;
+        }
+
+        private List<DNSRecordModel> FilterDNSRecordsFromResponse(ResponseRetrieve responseRetrieve, string dnsType)
+        {
+            List<DNSRecordModel> filteredRecords = new List<DNSRecordModel>();
+
+            foreach (var record in responseRetrieve.records)
+            {
+                if (record != null && 
+                    record.type.ToLower().Equals(dnsType.ToLower()) && 
+                    !record.content.Equals(currentIP))
+                {
+                    filteredRecords.Add(record);
+                }
+            }
+
+            return filteredRecords;
         }
 
         public void UpdateDNSRecords()

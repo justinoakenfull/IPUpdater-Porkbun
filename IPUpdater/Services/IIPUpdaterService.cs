@@ -10,7 +10,7 @@ namespace IPUpdater.Services
     public interface IIPUpdaterService
     {
         ResponsePing PingAPI();
-        void GetDNSRecords();
+        ResponseRetrieve GetDNSRecords();
         void UpdateDNSRecords();
     }
 }

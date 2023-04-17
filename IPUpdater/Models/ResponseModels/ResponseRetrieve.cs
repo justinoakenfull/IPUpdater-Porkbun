@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace IPUpdater.Models.ResponseModels
 {
-    internal class ResponseRetrieve : ResponseModel
+    public class ResponseRetrieve : ResponseModel
     {
         public List<DNSRecordModel> records { get; set; }
-
     }
 }
