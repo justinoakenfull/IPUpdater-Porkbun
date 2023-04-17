@@ -8,6 +8,7 @@ namespace IPUpdater.Models.ResponseModels
 {
     internal class ResponseRetrieve : ResponseModel
     {
+        public List<DNSRecordModel> records { get; set; }
 
     }
 }

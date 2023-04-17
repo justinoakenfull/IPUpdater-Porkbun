@@ -14,7 +14,7 @@ namespace IPUpdater.Models.PostModels
     //Use the API key and secret generated: https://porkbun.com/account/api
     public class PostModel
     {
-        public string apiKey { get; set; } = string.Empty;
-        public string apiSecret { get; set; } = string.Empty;
+        public string apikey { get; set; } = string.Empty;
+        public string secretapikey { get; set; } = string.Empty;
     }
 }
