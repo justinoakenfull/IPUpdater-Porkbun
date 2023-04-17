@@ -21,18 +21,19 @@ if (ConfigurationManager.AppSettings.Get("apikey") == null ||
     {
         Console.BackgroundColor = ConsoleColor.Gray;
         Console.ForegroundColor = ConsoleColor.DarkRed;
-        Console.WriteLine("                                                                                                                        ");
-        Console.WriteLine("                                                                                                                        ");
-        Console.WriteLine("                                                                                                                        ");
-        Console.WriteLine("                                                                                                                        ");
-        Console.WriteLine("========================================================================================================================");
-        Console.WriteLine("|| One or more of the application settings was blank, null or improperly formatted. Please check the App.config file. ||");
-        Console.WriteLine("========================================================================================================================");
-        Console.WriteLine("                                                                                                                        ");
-        Console.WriteLine("                                                                                                                        ");
-        Console.WriteLine("                                                                                                                        ");
-        Console.WriteLine("                                                                                                                        ");
+        Console.Write("                                                                                                                        \n");
+        Console.Write("                                                                                                                        \n");
+        Console.Write("                                                                                                                        \n");
+        Console.Write("                                                                                                                        \n");
+        Console.Write("========================================================================================================================\n");
+        Console.Write("|| One or more of the application settings was blank, null or improperly formatted. Please check the App.config file. ||\n");
+        Console.Write("========================================================================================================================\n");
+        Console.Write("                                                                                                                        \n");
+        Console.Write("                                                                                                                        \n");
+        Console.Write("                                                                                                                        \n");
+        Console.Write("                                                                                                                        \n");
         Console.ResetColor();
+        Console.ReadKey();
         Environment.Exit(2);
     }
 
@@ -130,4 +131,10 @@ if (currentIP != null)
         Console.WriteLine($"{currentIP.status}: {currentIP.message}");
         Console.ResetColor();
     }
+}
+
+if (userSettings.VerboseDebugging)
+{
+    Console.WriteLine("Press any key to exit the application...");
+    Console.ReadKey();
 }
