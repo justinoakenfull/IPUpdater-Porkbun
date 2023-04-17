@@ -1,1 +1,1 @@
-# IPUpdater
+# IPUpdater for porkbun DNS records.
