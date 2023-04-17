@@ -38,14 +38,17 @@ if (currentIP != null)
             {
                 foreach (var DNSRecord in DNSRecords.records)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"{DNSRecord.name.ToUpper()} - {DNSRecord.type}\n" +
-                                      $"========================\n" +
-                                      $"ID: {DNSRecord.id}\n" +
-                                      $"Set IP: {DNSRecord.content}\n" +
-                                      $"Server Current IP: {currentIP.yourip}\n" +
-                                      $"========================\n");
-                    Console.ResetColor();
+                    if(DNSRecord.type.ToLower().Equals(userSettings.RecordTypeToUpdate.ToLower()))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"{DNSRecord.name.ToUpper()} - {DNSRecord.type}\n" +
+                                          $"========================\n" +
+                                          $"ID: {DNSRecord.id}\n" +
+                                          $"Set IP: {DNSRecord.content}\n" +
+                                          $"Server Current IP: {currentIP.yourip}\n" +
+                                          $"========================\n");
+                        Console.ResetColor();
+                    }
                 }
             }
 
