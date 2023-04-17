@@ -13,22 +13,16 @@ namespace IPUpdater.Services
 {
     internal class IPUpdaterService : IIPUpdaterService
     {
-        private HttpClient _httpClient = new HttpClient();
         private UserSettingsModel _userSettings;
         private string currentIP = "";
         private PostModel _postModel = new PostModel();
         
         public ResponsePing PingAPI()
         {
-            //Set the URI we are posting to
-            _httpClient.BaseAddress = new Uri(_userSettings.APIPingURI);
-            //Create a post model that will be used as the json content
-            PostModel postModel = new PostModel{
-                apikey = _userSettings.apiKey,
-                secretapikey = _userSettings.secretapikey
-            };
+            //Create and get back the httpclient passing in the API endpoint we want to hit.
+            var _httpClient = CreateHttpClient(_userSettings.APIPingURI);
             //Convert the post model object to json
-            var content = new StringContent(JsonConvert.SerializeObject(postModel), UTF8Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(_postModel), UTF8Encoding.UTF8, "application/json");
             //Post the json to the api
             var apiResponse = _httpClient.PostAsync(_httpClient.BaseAddress, content);
             var readContentResponse = apiResponse.Result.Content.ReadAsStringAsync().Result;
@@ -43,16 +37,16 @@ namespace IPUpdater.Services
             {
                 currentIP = pingResponseModel.yourip;
             }
+            CloseHttpClient(_httpClient);
             return pingResponseModel;
         }
 
         public ResponseRetrieve GetDNSRecords()
         {
-            _httpClient.BaseAddress = new Uri(_userSettings.APIDNSRequestURI);
 
-            PostModel postRequest = new PostModel();
+            var _httpClient = CreateHttpClient($"{_userSettings.APIDNSRequestURI}{_userSettings.DomainToUpdate}");
 
-            var content = new StringContent(JsonConvert.SerializeObject(postRequest), UTF8Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(_postModel), UTF8Encoding.UTF8, "application/json");
             var apiResponse = _httpClient.PostAsync(_httpClient.BaseAddress, content);
             var readContentResponse = apiResponse.Result.Content.ReadAsStringAsync().Result;
             var dnsRetrieveResponseModel = JsonConvert.DeserializeObject<ResponseRetrieve>(readContentResponse);
@@ -62,11 +56,12 @@ namespace IPUpdater.Services
                 status = "ERROR",
                 message = "This error is not server produced. Error pinging API or JSON received was empty."
             };
-
+            
+            CloseHttpClient(_httpClient);
             return dnsRetrieveResponseModel;
         }
 
-        private List<DNSRecordModel> FilterDNSRecordsFromResponse(ResponseRetrieve responseRetrieve, string dnsType)
+        public List<DNSRecordModel> FilterDNSRecordsFromResponse(ResponseRetrieve responseRetrieve, string dnsType)
         {
             List<DNSRecordModel> filteredRecords = new List<DNSRecordModel>();
 
@@ -94,5 +89,15 @@ namespace IPUpdater.Services
             _postModel.apikey = _userSettings.apiKey;
             _postModel.secretapikey = _userSettings.secretapikey;
         }
+
+        private HttpClient CreateHttpClient(string BaseAddress)
+        {
+            var _httpClient = new HttpClient();
+            _httpClient.BaseAddress = new Uri(BaseAddress);
+
+            return _httpClient;
+        }
+
+        private void CloseHttpClient(HttpClient client) { client.Dispose(); }
     }
 }

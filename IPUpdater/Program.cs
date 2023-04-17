@@ -4,8 +4,6 @@ using IPUpdater.Data;
 using IPUpdater.Services;
 using IPUpdater.Models;
 
-APIHelper helper = new APIHelper();
-
 UserSettingsModel userSettings = new UserSettingsModel(ConfigurationManager.AppSettings.Get("apikey"),
                                                        ConfigurationManager.AppSettings.Get("secretapikey"),
                                                        ConfigurationManager.AppSettings.Get("DomainToUpdate"),
@@ -15,3 +13,7 @@ UserSettingsModel userSettings = new UserSettingsModel(ConfigurationManager.AppS
                                                        ConfigurationManager.AppSettings.Get("PorkbunDNSEdit"));
 
 IPUpdaterService apiService = new IPUpdaterService(userSettings);
+
+var currentIP = apiService.PingAPI();
+var DNSRecords = apiService.GetDNSRecords();
+var filteredRecords = apiService.FilterDNSRecordsFromResponse(DNSRecords, ConfigurationManager.AppSettings.Get("RecordTypeToUpdate"));
