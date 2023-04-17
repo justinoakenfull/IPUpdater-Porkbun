@@ -16,6 +16,7 @@ namespace IPUpdater.Services
         private HttpClient _httpClient = new HttpClient();
         private UserSettingsModel _userSettings;
         private string currentIP = "";
+        private PostModel _postModel = new PostModel();
         
         public ResponsePing PingAPI()
         {
@@ -49,7 +50,7 @@ namespace IPUpdater.Services
         {
             _httpClient.BaseAddress = new Uri(_userSettings.APIDNSRequestURI);
 
-            PostRequestModel postRequest = new PostRequestModel();
+            PostModel postRequest = new PostModel();
 
             var content = new StringContent(JsonConvert.SerializeObject(postRequest), UTF8Encoding.UTF8, "application/json");
             var apiResponse = _httpClient.PostAsync(_httpClient.BaseAddress, content);
@@ -90,6 +91,8 @@ namespace IPUpdater.Services
         public IPUpdaterService(UserSettingsModel userSettings)
         {
             _userSettings = userSettings;
+            _postModel.apikey = _userSettings.apiKey;
+            _postModel.secretapikey = _userSettings.secretapikey;
         }
     }
 }
